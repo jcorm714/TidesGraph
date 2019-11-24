@@ -38,9 +38,20 @@ if 'data' in data.keys():
     time_list = [] #independent variable
     tide_height_list = [] #dependent variable
 
+    max = -10
+    min = 15
+
     for row in data["data"]: 
+        
+        #search for max in min inside data
+        tide_height = float(row['v'])
+        if(tide_height < min):
+            min = tide_height
+        elif(tide_height > max):
+            max = tide_height
+
+        tide_height_list.append(tide_height)
         time_list.append(dt.datetime.strptime(row['t'], '%Y-%m-%d %H:%M'))
-        tide_height_list.append(float(row['v']))
 
     end_date = start_date + dt.timedelta(days=14)
     
@@ -48,6 +59,9 @@ if 'data' in data.keys():
     title = "Tide Heights: Station 8454000 ("
     title += start_date.date().strftime("%Y-%m-%d") + " to "
     title += end_date.date().strftime("%Y-%m-%d") + ")"
+   
+   
+
    
     #set up the graph to be generated
     axes = plt.axes()
@@ -58,4 +72,5 @@ if 'data' in data.keys():
     axes.set_xlim([start_date, end_date])
     axes.set_yticks([ -0.5, 0, 0.5, 1.0, 1.5, 2.0])
     plt.plot(time_list, tide_height_list)
+    plt.text(start_date + dt.timedelta(hours=12), 1.75, f"Max: {max}\nMin: {min}", bbox=dict(facecolor='blue', alpha=0.5))
     plt.show()

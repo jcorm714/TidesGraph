@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args": ["--date", "2012-11-02"]
+            "args": ["--date", "2012-07-14"]
         }
     ]
 }
