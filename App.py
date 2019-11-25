@@ -2,6 +2,7 @@ import requests
 from matplotlib import pyplot as plt
 import datetime as dt
 import argparse as ap
+import math
 
 
 #retreive JSON data from url
@@ -17,6 +18,13 @@ def getJSON(start_date):
     url = f"https://tidesandcurrents.noaa.gov/api/datagetter?begin_date={str_start}&end_date={str_end}&station=8454000&product=water_level&datum=mllw&units=metric&time_zone=gmt&application=web_services&format=json"
     r = requests.get(url)
     return r.json()
+
+#create a range function to support floats
+def frange(start, stop, step = 1):
+    i = start
+    while i < stop:
+        yield i
+        i += step
 
 #retrieve date entered from the CLI
 parser = ap.ArgumentParser()
@@ -68,9 +76,15 @@ if 'data' in data.keys():
     axes.set_title(title)
     axes.set_ylabel("Tide Height (meters)")
     axes.set_xlabel("Date")
-    axes.set_ylim([-0.5, 2.0])
+    axes.set_ylim([math.floor(min), math.ceil(max)])
     axes.set_xlim([start_date, end_date])
-    axes.set_yticks([ -0.5, 0, 0.5, 1.0, 1.5, 2.0])
+
+    #generate the list of yticks based off the min and max with a step of 0.5 in between
+    axes.set_yticks([ (i) for i in frange(math.floor(min), math.ceil(max), step=0.5)])
+
     plt.plot(time_list, tide_height_list)
-    plt.text(start_date + dt.timedelta(hours=12), 1.75, f"Max: {max}\nMin: {min}", bbox=dict(facecolor='blue', alpha=0.5))
+    
+    #set the box for the to the top left corner. Note it is relative to the recieved for
+    #generating for the graph.
+    plt.text(start_date + dt.timedelta(hours=12), float(math.ceil(max)) - 0.25, f"Max: {max}\nMin: {min}", bbox=dict(facecolor='blue', alpha=0.5))
     plt.show()
